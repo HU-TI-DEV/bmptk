@@ -117,10 +117,8 @@ ifeq ($(OS),Windows_NT)
    PAUSE         ?= cmd /c pause
 
    # needed to be able to update PATH
-   # NB: 'export' does not work on Windows command interpreter
    .ONESHELL:
-   set PATH=%PATH%;$(GCC-WIN)/bin
-   #export PATH=%PATH%;$(GCC-WIN)/bin
+   export PATH += ;$(GCC-WIN)/bin
 
    # find python
    PYTHON_LOCATIONS += 'C:/Program Files\ (x86)/Pytho*'
