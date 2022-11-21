@@ -117,8 +117,10 @@ ifeq ($(OS),Windows_NT)
    PAUSE         ?= cmd /c pause
 
    # needed to be able to update PATH
+   # NB: 'export' does not work on Windows command interpreter
    .ONESHELL:
-   export PATH=%PATH%;$(GCC-WIN)/bin
+   set PATH=%PATH%;$(GCC-WIN)/bin
+   #export PATH=%PATH%;$(GCC-WIN)/bin
 
    # find python
    PYTHON_LOCATIONS += 'C:/Program Files\ (x86)/Pytho*'
@@ -133,6 +135,8 @@ ifeq ($(OS),Windows_NT)
    PYTHON_DLLS      += "$(PYTHON_LOCATION)\Python3.dll" "$(PYTHON_LOCATION)\Python36.dll"
 
 else
+   # OS is not Windows
+
    MAKE          ?= make
    REMOVE        ?= rm -f
    COPY          ?= cp
@@ -170,6 +174,7 @@ else
        LPC21ISP      ?= $(SUDO) $(LPC21ISP_EXE)
        LPC21ISP_EXE  ?= $(BMPTK)/tools/lpc21isp_197/lpc21isp_hr_linux.exe
    endif
+
 endif
 
 $(BMPTK)/tools/lpc21isp_197/lpc21isp_hr_linux.exe:
@@ -1755,6 +1760,7 @@ codelite:
 codelite_workspace:
 	$(PYTHON) $(BMPTK)/tools/bmptk-mef.py -os $(OSNAME)
 
+
 renumber:
 	$(PYTHON) $(BMPTK)/tools/bmptk-renumber.py
 
@@ -1766,3 +1772,5 @@ CLEAN += _cc_flags _cpp_flags _linker_flags _linker_libs
 clean:
 	$(REMOVE) $(CLEAN)
 	@echo ' '
+
+#eof
