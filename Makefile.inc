@@ -452,6 +452,10 @@ ifeq ($(TARGET),xmc_2go_1100)
    CHIP        ?= xmc1100
 endif
 
+ifeq ($(TARGET),pi_pico)
+   CHIP        ?= rp2040
+endif
+
 #MADE BY OSCAR
 ifeq ($(TARGET),teensy_40)
    CHIP        ?= mimxrt1062dvl6a
@@ -1155,7 +1159,6 @@ define Atmel_SAM3
    DEFINES        += -DBMPTK_INCLUDE_CHIP=sam.h
    LDFLAGS        += -I$(BMPTK)/targets/cortex/atmel/sam3xa/source/as_gcc
    RUN_TERMINAL   ?= $(LPC21ISP) -termonly -term $(HEX) $(SERIAL_PORT) $(CONSOLE_BAUDRATE) 12000
-
 endef
 
 #   ifeq($(SERIAL_BAUDRATE),1200)
@@ -1171,6 +1174,36 @@ ifeq ($(CHIP),sam3x8e)
    RAM_SIZE       ?= 96k
    STACK_SIZE     ?= 73728
    DEFINES        += -D__SAM3X8E__
+endif
+
+
+   #======================================================================
+   #
+   # Raspberry Pi Pico (RP2040) Cortex chips
+   #
+   #======================================================================
+
+define RASPBERRY_PI_RP2040
+   $(eval $(Cortex-M0+))
+   ROM_START       ?= 0x00000000
+   RAM_START       ?= 0x20000000
+   # FLASH starts at 0x10000000
+   INCLUDES        += -I$(BMPTK)/targets/cortex/rp2/cmsis
+   DEFINES         += -DBMPTK_INCLUDE_CHIP=RP2040.h
+   XTAL            ?= 12000
+   RESULTS         += $(HEX)
+   PORT_CHECK      ?= $(CHECK_PORT) $(UART_PORT)
+   SERIAL_BAUDRATE ?= 115200
+   LPCISP_PARAMS   := $(HEX) $(UART_PORT) $(SERIAL_BAUDRATE) 12000
+   RUN             ?= $(LPC21ISP) -control -verify $(HEX) $(UART_PORT) $(SERIAL_BAUDRATE) 12000
+   RUN_TERMINAL    ?= $(LPC21ISP) -termonly -control -term $(HEX) $(UART_PORT) $(CONSOLE_BAUDRATE) 12000
+endef
+
+ifeq ($(CHIP),rp2040)
+   $(eval $(RASPBERRY_PI_RP2040))
+   ROM_SIZE       ?= 16k
+   RAM_SIZE       ?= 264k
+   STACK_SIZE     ?= 2048
 endif
 
    #======================================================================
