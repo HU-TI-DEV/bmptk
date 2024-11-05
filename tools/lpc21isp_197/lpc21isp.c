@@ -452,6 +452,19 @@ static void OpenSerialPort(ISP_ENVIRONMENT *IspEnvironment)
     (void)timeBeginPeriod(1UL);
 #endif // _MSC_VER
 
+    /* ManDeJan 2024-11-05, enable usage of com ports higher than 9 on windows */
+    if (strncmp(IspEnvironment->serial_port, "\\\\.\\", 4) != 0)
+    {
+        char *tmp = (char *)malloc(strlen(IspEnvironment->serial_port) + 5); /* feel free to free later :^) */
+        if (tmp == NULL)
+        {
+            DebugPrintf(1, "Can't allocate memory for COM-Port name !\n");
+            exit(1);
+        }
+        strcpy(tmp, "\\\\.\\");
+        strcat(tmp, IspEnvironment->serial_port);
+        IspEnvironment->serial_port = tmp;
+    }
     IspEnvironment->hCom = CreateFile(IspEnvironment->serial_port, GENERIC_READ | GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
 
     if (IspEnvironment->hCom == INVALID_HANDLE_VALUE)
@@ -2046,7 +2059,7 @@ static int LoadFile(ISP_ENVIRONMENT *IspEnvironment, const char *filename, int F
 
     FileLength = lseek(fd, 0L, 2);      // Get file size
 
-    if (FileLength == (size_t)-1)
+    if (FileLength == -1)
     {
         DebugPrintf(1, "\nFileLength = -1 !?!\n");
         return ERR_FILE_SIZE_HEX;
