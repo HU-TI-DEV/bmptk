@@ -1,4 +1,5 @@
-all:      lpc21isp_hr_linux.exe
+all:      lpc21isp
+
 GLOBAL_DEP  = adprog.h lpc21isp.h lpcprog.h lpcterm.h
 CC = gcc
 
@@ -15,7 +16,7 @@ CFLAGS		+= -Wall
 ifneq ($(findstring Darwin,$(OSTYPE)),)
 CFLAGS+=-D__APPLE__
 else
-# CFLAGS		+= -static
+CFLAGS		+= -static
 endif
 
 adprog.o: adprog.c $(GLOBAL_DEP)
@@ -27,8 +28,8 @@ lpcprog.o: lpcprog.c $(GLOBAL_DEP)
 lpcterm.o: lpcterm.c $(GLOBAL_DEP)
 	$(CC) $(CDEBUG) $(CFLAGS) -c -o lpcterm.o lpcterm.c
 
-lpc21isp_hr_linux.exe: lpc21isp.c adprog.o lpcprog.o lpcterm.o $(GLOBAL_DEP)
-	$(CC) $(CDEBUG) $(CFLAGS) -o lpc21isp_hr_linux.exe lpc21isp.c adprog.o lpcprog.o lpcterm.o
+lpc21isp: lpc21isp.c adprog.o lpcprog.o lpcterm.o $(GLOBAL_DEP)
+	$(CC) $(CDEBUG) $(CFLAGS) -o lpc21isp lpc21isp.c adprog.o lpcprog.o lpcterm.o
 
 clean:
-	$(RM) adprog.o lpcprog.o lpcterm.o lpc21isp_hr_linux.exe
+	$(RM) adprog.o lpcprog.o lpcterm.o lpc21isp
